@@ -108,6 +108,13 @@ getUndefinedLabel =
 ----------------------------------------------------------------------------
 -- Instructions 
 ----------------------------------------------------------------------------
+
+-- TODO: functions that do not return "Value" returns an Int
+--       check this int for error conditions ?
+-- TODO: The return value can probably be NULL for failed 
+--       attempt to generate a instr. Check if Value ptr is null. 
+
+-- Arithmetic 
 {# fun unsafe jit_insn_mul as mul
    { fromFunction `Function' ,
      fromValue    `Value' ,
@@ -118,12 +125,31 @@ getUndefinedLabel =
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' Value #} 
 
+{# fun unsafe jit_insn_sub as sub
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' Value #} 
+
+-- Comparisons
+{# fun jit_insn_lt as lt
+   { fromfunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' Value #} 
+
+-- Branch
+{# fun jit_insn_branch_if_not as branchIfNot
+   { fromFunction `Function'  ,
+     fromValue    `Value'     ,
+     fromLabel    `Label' } -> `()' #}
+
+-- Return 
 {# fun unsafe jit_insn_return as ret 
    { fromFunction `Function' ,
      fromValue    `Value' } -> `()' #}  
 
+-- Function calls
 -- TODO: Figure this one out (how to use it) 
-{# fun unsafe jit_insn_call_native as callNative 
+{# fun unsafe jit_insn_call_native as callNativeFunction 
    { fromFunction `Function'   ,
      withCString* `String'     ,
      id           `Ptr ()'     ,
@@ -132,7 +158,17 @@ getUndefinedLabel =
      cFromInt     `Int'        ,
      cFromInt     `Int'   } -> `Value' Value #}
 
+{# fun unsafe jit_insn_call as callFunction 
+   { fromFunction `Function'   ,
+     withCString* `String'     ,
+     fromFunction `Function'   ,
+     fromType     `Type'       ,
+     withValueArray* `[Value]' ,
+     cFromInt     `Int'        ,
+     cFromInt     `Int'  } -> `Value' Value #} 
+     
 
+-- Labels
 {# fun unsafe jit_insn_label as setLabel 
    { fromFunction `Function'   ,
      fromLabel    `Label'  } -> `()' #}
