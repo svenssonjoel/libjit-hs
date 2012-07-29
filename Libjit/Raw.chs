@@ -101,9 +101,10 @@ getUndefinedLabel =
    value <- getUndefLab
    lab <- mallocForeignPtr 
    poke  (unsafeForeignPtrToPtr lab) value
+   return (Label lab)
 
 {# fun unsafe getUndefinedLabel as getUndefLab 
-    { } -> `Word64' cFromInt #} 
+    { } -> `CULong' cFromInt #} 
 
 ----------------------------------------------------------------------------
 -- Instructions 
@@ -132,6 +133,11 @@ getUndefinedLabel =
 
 -- Comparisons
 {# fun jit_insn_lt as lt
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' Value #} 
+
+{# fun jit_insn_eq as eq
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' Value #} 
