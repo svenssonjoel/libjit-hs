@@ -10,4 +10,9 @@ JIT_TYPE_PROTO(long);
 JIT_TYPE_PROTO(float32);
 JIT_TYPE_PROTO(float64);
 
+/* -- LABELS -- */
+
+jit_label_t getUndefinedLabel();
+
+
 #endif
