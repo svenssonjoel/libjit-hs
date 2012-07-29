@@ -132,7 +132,7 @@ getUndefinedLabel =
 
 -- Comparisons
 {# fun jit_insn_lt as lt
-   { fromfunction  `Function' ,
+   { fromFunction  `Function' ,
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' Value #} 
 
