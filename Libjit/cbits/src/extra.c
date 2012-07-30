@@ -8,8 +8,13 @@
   return jit_type_ ## x; \
   }
 
+JIT_TYPE(void);
+JIT_TYPE(sbyte);
+JIT_TYPE(ubyte);
 JIT_TYPE(int);
+JIT_TYPE(uint);
 JIT_TYPE(long);
+JIT_TYPE(ulong);
 JIT_TYPE(float32);
 JIT_TYPE(float64);
 

@@ -5,8 +5,13 @@
 
 #define JIT_TYPE_PROTO(x) extern jit_type_t get_ ## x ## _type(); 
 
+JIT_TYPE_PROTO(void);
+JIT_TYPE_PROTO(sbyte);
+JIT_TYPE_PROTO(ubyte);
 JIT_TYPE_PROTO(int);
+JIT_TYPE_PROTO(uint);
 JIT_TYPE_PROTO(long);
+JIT_TYPE_PROTO(ulong);
 JIT_TYPE_PROTO(float32);
 JIT_TYPE_PROTO(float64);
 

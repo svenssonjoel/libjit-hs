@@ -181,13 +181,26 @@ getUndefinedLabel =
 
 ----------------------------------------------------------------------------
 -- TODO: One of these for each type 
+{# fun unsafe get_void_type as getVoidType 
+   {  } -> `Type' Type #}  
+
+{# fun unsafe get_sbyte_type as getSByteType 
+   {  } -> `Type' Type #}  
+
+{# fun unsafe get_ubyte_type as getUByteType 
+   {  } -> `Type' Type #}  
 
 {# fun unsafe get_int_type as getIntType 
+   {  } -> `Type' Type #}  
+
+{# fun unsafe get_uint_type as getUIntType 
    {  } -> `Type' Type #}  
 
 {# fun unsafe get_long_type as getLongType 
    {  } -> `Type' Type #}  
 
+{# fun unsafe get_ulong_type as getULongType 
+   {  } -> `Type' Type #}  
 
 {# fun unsafe get_float32_type as getFloat32Type 
    {  } -> `Type' Type #}  

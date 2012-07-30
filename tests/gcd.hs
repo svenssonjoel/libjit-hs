@@ -12,14 +12,14 @@ import Data.Int
 main =
   do
     ctx <- contextCreate
-    int_type <- getIntType
+    uint_type <- getUIntType
     startBuild(ctx)
     lab1 <- getUndefinedLabel
     lab2 <- getUndefinedLabel
 
     sig <- createTypeSignature CDECL
-                               int_type
-                               [int_type,int_type]
+                               uint_type
+                               [uint_type,uint_type]
                                2 1
                                
     fun <- createFunction ctx sig
