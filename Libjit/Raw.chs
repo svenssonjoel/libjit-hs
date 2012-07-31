@@ -1,6 +1,7 @@
 
 
-{-# LANGUAGE ForeignFunctionInterface #-} 
+{-# LANGUAGE ForeignFunctionInterface,
+             DeriveDataTypeable #-} 
 
 
 module Libjit.Raw  where 
@@ -13,7 +14,10 @@ import Foreign.C.String
 import Foreign.Marshal.Array
 
 import Data.Word
+import Data.Typeable
 
+import Control.Exception
+import Control.Monad
 
 
 #include <jit/jit.h>
@@ -48,6 +52,31 @@ cFromInt :: (Integral a, Integral b) => a -> b
 cFromInt = fromIntegral
 
 ----------------------------------------------------------------------------
+-- Exceptions
+----------------------------------------------------------------------------
+data LIBJITException = LIBJITException (Maybe Int) String
+                    deriving (Eq, Show,Typeable) 
+
+instance Exception LIBJITException
+
+throwRaw :: String -> Ptr () -> IO ()
+throwRaw str ptr =
+  do
+    when (nullPtr == ptr)
+      $ throwIO (LIBJITException Nothing str)
+
+throwOnBadValue :: Value -> IO Value 
+throwOnBadValue v = throwRaw "Value is null" (fromValue v) >> return v 
+
+throwOnBadContext c = throwRaw "Context is null" (fromContext c) >> return c 
+                    
+
+throwOnError :: Int -> IO ()
+throwOnError i =
+  do
+    when (i /= 0)
+      $ throwIO (LIBJITException (Just i) "Returned error code")  
+----------------------------------------------------------------------------
 -- Enums 
 ----------------------------------------------------------------------------
 
@@ -61,7 +90,9 @@ cFromInt = fromIntegral
 ----------------------------------------------------------------------------
 -- Functions 
 ----------------------------------------------------------------------------
-{# fun unsafe jit_context_create as contextCreate 
+contextCreate = contextCreate' >>= throwOnBadContext 
+
+{# fun unsafe jit_context_create as contextCreate' 
    { } -> `Context' Context #} 
 
 {# fun unsafe jit_context_build_start as startBuild 
