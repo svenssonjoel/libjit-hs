@@ -39,7 +39,7 @@ main =
                        fun
                        (Type nullPtr) 
                        [x,a1]
-                       2 0
+                       2 CallNothrow
     ret fun t3 
     setLabel fun lab2                       
   
@@ -49,7 +49,7 @@ main =
                        fun
                        (Type nullPtr)
                        [a0,y]
-                       2 0
+                       2 CallNothrow
     ret fun t4 
 
     compile fun

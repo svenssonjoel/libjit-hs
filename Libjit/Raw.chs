@@ -51,6 +51,8 @@ cFromEnum = fromIntegral . fromEnum
 cFromInt :: (Integral a, Integral b) => a -> b 
 cFromInt = fromIntegral
 
+fromFunPtr = castFunPtrToPtr 
+
 ----------------------------------------------------------------------------
 -- Exceptions
 ----------------------------------------------------------------------------
@@ -85,6 +87,18 @@ throwOnError i =
                          , jit_abi_vararg as VARARG
                          , jit_abi_stdcall as STDCALL
                          , jit_abi_fastcall as FASTCALL } #}
+
+-- These are just defines in the C library.
+#c 
+enum CALL_FLAG_ENUM {
+  call_nothrow = JIT_CALL_NOTHROW,
+  call_noreturn = JIT_CALL_NORETURN,
+  call_tail = JIT_CALL_TAIL
+}; 
+
+#endc 
+
+{# enum CALL_FLAG_ENUM as CallFlag {underscoreToCase} deriving (Eq,Show) #} 
 
 
 ----------------------------------------------------------------------------
@@ -189,11 +203,11 @@ getUndefinedLabel =
 {# fun unsafe jit_insn_call_native as callNativeFunction 
    { fromFunction `Function'   ,
      withCString* `String'     ,
-     id           `Ptr ()'     ,
+     fromFunPtr   `FunPtr a'   ,
      fromType     `Type'       ,
      withValueArray* `[Value]' ,
      cFromInt     `Int'        ,
-     cFromInt     `Int'   } -> `Value' Value #}
+     cFromEnum     `CallFlag' } -> `Value' Value #}
 
 {# fun unsafe jit_insn_call as callFunction 
    { fromFunction `Function'   ,
@@ -202,7 +216,7 @@ getUndefinedLabel =
      fromType     `Type'       ,
      withValueArray* `[Value]' ,
      cFromInt     `Int'        ,
-     cFromInt     `Int'  } -> `Value' Value #} 
+     cFromEnum    `CallFlag'  } -> `Value' Value #} 
      
 
 -- Labels
