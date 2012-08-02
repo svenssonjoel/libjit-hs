@@ -271,7 +271,17 @@ getUndefinedLabel =
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
 
--- Comparisons
+{# fun unsafe jit_insn_div as div
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_neg as neg
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+
+-- Comparisons and boolean 
 {# fun jit_insn_lt as lt
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
@@ -282,7 +292,32 @@ getUndefinedLabel =
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' checkedValue* #} 
 
+{# fun jit_insn_and as and
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_or as or
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_xor as xor
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+
 -- Branch
+{# fun jit_insn_branch as branch
+   { fromFunction `Function'  ,
+     fromLabel    `Label' } -> `()' #}
+
+{# fun jit_insn_branch_if as branchIf
+   { fromFunction `Function'  ,
+     fromValue    `Value'     ,
+     fromLabel    `Label' } -> `()' #}
+
 {# fun jit_insn_branch_if_not as branchIfNot
    { fromFunction `Function'  ,
      fromValue    `Value'     ,
@@ -370,19 +405,19 @@ DONE: jit_value_t jit_insn_mul
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 jit_value_t jit_insn_mul_ovf
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_div
+DONE: jit_value_t jit_insn_div
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_rem
+DONE: jit_value_t jit_insn_rem
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 jit_value_t jit_insn_rem_ieee
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_neg
+DONE: jit_value_t jit_insn_neg
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_and
+DONE: jit_value_t jit_insn_and
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_or
+DONE: jit_value_t jit_insn_or
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_xor
+DONE: jit_value_t jit_insn_xor
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 jit_value_t jit_insn_not
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
@@ -466,11 +501,11 @@ jit_value_t jit_insn_max
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 jit_value_t jit_insn_sign
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-int jit_insn_branch
+DONE: int jit_insn_branch
 	(jit_function_t func, jit_label_t *label) JIT_NOTHROW;
-int jit_insn_branch_if
+DONE: int jit_insn_branch_if
 	(jit_function_t func, jit_value_t value, jit_label_t *label) JIT_NOTHROW;
-int jit_insn_branch_if_not
+DONE: int jit_insn_branch_if_not
 	(jit_function_t func, jit_value_t value, jit_label_t *label) JIT_NOTHROW;
 int jit_insn_jump_table
 	(jit_function_t func, jit_value_t value,
