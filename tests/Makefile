@@ -13,3 +13,10 @@ call_native: call_native.hs
 	ghc --make call_native.hs ../Libjit/cbits/o/extra.o -ljit -i../
 
 
+
+clean:
+	rm *.o
+	rm *.hi 
+	rm mul_add
+	rm gcd
+	rm call_native

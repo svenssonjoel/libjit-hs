@@ -68,16 +68,23 @@ throwRaw str ptr =
       $ throwIO (LIBJITException Nothing str)
 
 throwOnBadValue :: Value -> IO Value 
-throwOnBadValue v = throwRaw "Value is null" (fromValue v) >> return v 
+throwOnBadValue v = throwRaw "Value is null" (fromValue v) >> return v
+
+throwOnBadFunction :: Function -> IO Function
+throwOnBadFunction f = throwRaw "Function is null" (fromFunction f) >> return f 
 
 throwOnBadContext c = throwRaw "Context is null" (fromContext c) >> return c 
                     
-
+-- Libjit uses the dotNET,dotGNU,windows tradition
+-- of having 1 = Success 
+--           0 = Failure
 throwOnError :: Int -> IO ()
 throwOnError i =
   do
-    when (i /= 0)
-      $ throwIO (LIBJITException (Just i) "Returned error code")  
+    when (i /= 1)
+      $ throwIO (LIBJITException (Just i) "Returned error code")
+
+checkedValue v = throwOnBadValue (Value v) 
 ----------------------------------------------------------------------------
 -- Enums 
 ----------------------------------------------------------------------------
@@ -102,12 +109,19 @@ enum CALL_FLAG_ENUM {
 
 
 ----------------------------------------------------------------------------
--- Functions 
+-- Context  (jit-context.h) 
 ----------------------------------------------------------------------------
 contextCreate = contextCreate' >>= throwOnBadContext 
 
 {# fun unsafe jit_context_create as contextCreate' 
    { } -> `Context' Context #} 
+
+{# fun unsafe jit_context_destroy as contextDestroy 
+   { fromContext `Context' } -> `()' #} 
+
+-- TODO: figure out what to do with this one
+{# fun unsafe jit_context_supports_threads as contextSupportsThreads 
+   { fromContext `Context' } -> `Int' cFromInt #} 
 
 {# fun unsafe jit_context_build_start as startBuild 
    { fromContext `Context' } -> `()' #}
@@ -115,6 +129,29 @@ contextCreate = contextCreate' >>= throwOnBadContext
 {# fun unsafe jit_context_build_end as endBuild 
    { fromContext `Context' } -> `()' #}
 
+{- 
+DONE: jit_context_t jit_context_create(void) JIT_NOTHROW;
+DONE: void jit_context_destroy(jit_context_t context) JIT_NOTHROW;
+IN PROGRESS: int jit_context_supports_threads(jit_context_t context) JIT_NOTHROW;
+DONE: void jit_context_build_start(jit_context_t context) JIT_NOTHROW;
+DONE: void jit_context_build_end(jit_context_t context) JIT_NOTHROW;
+void jit_context_set_on_demand_driver(
+	jit_context_t context,
+	jit_on_demand_driver_func driver) JIT_NOTHROW;
+int jit_context_set_meta
+	(jit_context_t context, int type, void *data,
+	 jit_meta_free_func free_data) JIT_NOTHROW;
+int jit_context_set_meta_numeric
+	(jit_context_t context, int type, jit_nuint data) JIT_NOTHROW;
+void *jit_context_get_meta(jit_context_t context, int type) JIT_NOTHROW;
+jit_nuint jit_context_get_meta_numeric
+	(jit_context_t context, int type) JIT_NOTHROW;
+void jit_context_free_meta(jit_context_t context, int type) JIT_NOTHROW;
+-} 
+
+----------------------------------------------------------------------------
+-- Functions (jit-function.h) 
+----------------------------------------------------------------------------
 {# fun unsafe jit_type_create_signature as createTypeSignature
    { cFromEnum `ABI' ,
      fromType  `Type' ,
@@ -122,9 +159,21 @@ contextCreate = contextCreate' >>= throwOnBadContext
      cFromInt  `Int' ,
      cFromInt  `Int' } -> `Type' Type #} 
      
-{# fun unsafe jit_function_create as createFunction
+createFunction c t = createFunction' c t >>= throwOnBadFunction 
+
+{# fun unsafe jit_function_create as createFunction'
    { fromContext `Context' ,
      fromType    `Type' } -> `Function' Function #} 
+
+createNestedFunction c t f = createNestedFunction' c t f >>= throwOnBadFunction 
+
+{# fun unsafe jit_function_create_nested as createNestedFunction'
+   { fromContext  `Context' ,
+     fromType     `Type'    ,
+     fromFunction `Function' } -> `Function' Function #} 
+
+{#fun unsafe jit_function_abandon as abandonFunction 
+   { fromFunction `Function' } -> `()' #} 
 
 {# fun unsafe jit_value_get_param as getParam 
    { fromFunction `Function' ,
@@ -136,8 +185,57 @@ contextCreate = contextCreate' >>= throwOnBadContext
 {# fun unsafe jit_function_apply as apply 
    { fromFunction `Function' ,
      withArray*   `[Ptr ()]' ,
-            id    `Ptr ()' } -> `()' #}  
-
+            id    `Ptr ()' } -> `()' #} 
+{-  
+DONE: jit_function_t jit_function_create
+	(jit_context_t context, jit_type_t signature) JIT_NOTHROW;
+DONE: jit_function_t jit_function_create_nested
+	(jit_context_t context, jit_type_t signature,
+	 jit_function_t parent) JIT_NOTHROW;
+DONE: void jit_function_abandon(jit_function_t func) JIT_NOTHROW;
+jit_context_t jit_function_get_context(jit_function_t func) JIT_NOTHROW;
+jit_type_t jit_function_get_signature(jit_function_t func) JIT_NOTHROW;
+int jit_function_set_meta
+	(jit_function_t func, int type, void *data,
+	 jit_meta_free_func free_data, int build_only) JIT_NOTHROW;
+void *jit_function_get_meta(jit_function_t func, int type) JIT_NOTHROW;
+void jit_function_free_meta(jit_function_t func, int type) JIT_NOTHROW;
+jit_function_t jit_function_next
+	(jit_context_t context, jit_function_t prev) JIT_NOTHROW;
+jit_function_t jit_function_previous
+	(jit_context_t context, jit_function_t prev) JIT_NOTHROW;
+jit_block_t jit_function_get_entry(jit_function_t func) JIT_NOTHROW;
+jit_block_t jit_function_get_current(jit_function_t func) JIT_NOTHROW;
+jit_function_t jit_function_get_nested_parent(jit_function_t func) JIT_NOTHROW;
+int jit_function_compile(jit_function_t func) JIT_NOTHROW;
+int jit_function_is_compiled(jit_function_t func) JIT_NOTHROW;
+void jit_function_set_recompilable(jit_function_t func) JIT_NOTHROW;
+void jit_function_clear_recompilable(jit_function_t func) JIT_NOTHROW;
+int jit_function_is_recompilable(jit_function_t func) JIT_NOTHROW;
+int jit_function_compile_entry(jit_function_t func, void **entry_point) JIT_NOTHROW;
+void jit_function_setup_entry(jit_function_t func, void *entry_point) JIT_NOTHROW;
+void *jit_function_to_closure(jit_function_t func) JIT_NOTHROW;
+jit_function_t jit_function_from_closure
+	(jit_context_t context, void *closure) JIT_NOTHROW;
+jit_function_t jit_function_from_pc
+	(jit_context_t context, void *pc, void **handler) JIT_NOTHROW;
+void *jit_function_to_vtable_pointer(jit_function_t func) JIT_NOTHROW;
+jit_function_t jit_function_from_vtable_pointer
+	(jit_context_t context, void *vtable_pointer) JIT_NOTHROW;
+void jit_function_set_on_demand_compiler
+	(jit_function_t func, jit_on_demand_func on_demand) JIT_NOTHROW;
+jit_on_demand_func jit_function_get_on_demand_compiler(jit_function_t func) JIT_NOTHROW;
+int jit_function_apply
+	(jit_function_t func, void **args, void *return_area);
+int jit_function_apply_vararg
+	(jit_function_t func, jit_type_t signature, void **args, void *return_area);
+void jit_function_set_optimization_level
+	(jit_function_t func, unsigned int level) JIT_NOTHROW;
+unsigned int jit_function_get_optimization_level
+	(jit_function_t func) JIT_NOTHROW;
+unsigned int jit_function_get_max_optimization_level(void) JIT_NOTHROW;
+jit_label_t jit_function_reserve_label(jit_function_t func) JIT_NOTHROW;
+-} 
 ----------------------------------------------------------------------------
 -- Labels
 ----------------------------------------------------------------------------
@@ -155,37 +253,32 @@ getUndefinedLabel =
 -- Instructions 
 ----------------------------------------------------------------------------
 
--- TODO: functions that do not return "Value" returns an Int
---       check this int for error conditions ?
--- TODO: The return value can probably be NULL for failed 
---       attempt to generate a instr. Check if Value ptr is null. 
-
 -- Arithmetic 
 {# fun unsafe jit_insn_mul as mul
    { fromFunction `Function' ,
      fromValue    `Value' ,
-     fromValue    `Value' } -> `Value' Value #} 
+     fromValue    `Value' } -> `Value' checkedValue* #} 
 
 {# fun unsafe jit_insn_add as add
    { fromFunction `Function' ,
      fromValue    `Value' ,
-     fromValue    `Value' } -> `Value' Value #} 
+     fromValue    `Value' } -> `Value' checkedValue* #} 
 
 {# fun unsafe jit_insn_sub as sub
    { fromFunction `Function' ,
      fromValue    `Value' ,
-     fromValue    `Value' } -> `Value' Value #} 
+     fromValue    `Value' } -> `Value' checkedValue* #} 
 
 -- Comparisons
 {# fun jit_insn_lt as lt
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
-     fromValue     `Value' } -> `Value' Value #} 
+     fromValue     `Value' } -> `Value' checkedValue* #} 
 
 {# fun jit_insn_eq as eq
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
-     fromValue     `Value' } -> `Value' Value #} 
+     fromValue     `Value' } -> `Value' checkedValue* #} 
 
 -- Branch
 {# fun jit_insn_branch_if_not as branchIfNot
@@ -207,7 +300,7 @@ getUndefinedLabel =
      fromType     `Type'       ,
      withValueArray* `[Value]' ,
      cFromInt     `Int'        ,
-     cFromEnum     `CallFlag' } -> `Value' Value #}
+     cFromEnum     `CallFlag' } -> `Value' checkedValue* #}
 
 {# fun unsafe jit_insn_call as callFunction 
    { fromFunction `Function'   ,
@@ -216,7 +309,7 @@ getUndefinedLabel =
      fromType     `Type'       ,
      withValueArray* `[Value]' ,
      cFromInt     `Int'        ,
-     cFromEnum    `CallFlag'  } -> `Value' Value #} 
+     cFromEnum    `CallFlag'  } -> `Value' checkedValue* #} 
      
 
 -- Labels
