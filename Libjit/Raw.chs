@@ -53,6 +53,8 @@ cFromInt = fromIntegral
 
 fromFunPtr = castFunPtrToPtr 
 
+intToBool i =  if i == 1 then True else False 
+  
 ----------------------------------------------------------------------------
 -- Exceptions
 ----------------------------------------------------------------------------
@@ -84,7 +86,7 @@ throwOnError i =
     when (i /= 1)
       $ throwIO (LIBJITException (Just i) "Returned error code")
 
-checkedValue v = throwOnBadValue (Value v) 
+checkedValue v = throwOnBadValue (Value v)
 ----------------------------------------------------------------------------
 -- Enums 
 ----------------------------------------------------------------------------
@@ -119,9 +121,9 @@ contextCreate = contextCreate' >>= throwOnBadContext
 {# fun unsafe jit_context_destroy as contextDestroy 
    { fromContext `Context' } -> `()' #} 
 
--- TODO: figure out what to do with this one
+-- TODO: figure out what to do with this one (1 means True, 0 means false) 
 {# fun unsafe jit_context_supports_threads as contextSupportsThreads 
-   { fromContext `Context' } -> `Int' cFromInt #} 
+   { fromContext `Context' } -> `Bool' intToBool #} 
 
 {# fun unsafe jit_context_build_start as startBuild 
    { fromContext `Context' } -> `()' #}
