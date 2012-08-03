@@ -255,7 +255,7 @@ getUndefinedLabel =
 -- Instructions (jit-insn.h)  
 ----------------------------------------------------------------------------
 
--- Arithmetic 
+-- Math 
 {# fun unsafe jit_insn_mul as mul
    { fromFunction `Function' ,
      fromValue    `Value' ,
@@ -301,8 +301,81 @@ getUndefinedLabel =
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
 
-
 {# fun unsafe jit_insn_neg as neg
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_acos as acos
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_asin as asin
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_atan as atan
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_atan2 as atan2
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_ceil as ceil
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_cos as cosh
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_exp as exp
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_floor as floor
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_log as log
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_log10 as log10
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_pow as pow
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_rint as rint
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_round as round
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_sin as sin
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_sinh as sinh
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_sqrt as sqrt
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_tan as tan
+   { fromFunction `Function' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_tanh as tanh
    { fromFunction `Function' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
 
@@ -324,6 +397,16 @@ getUndefinedLabel =
      fromValue     `Value' } -> `Value' checkedValue* #} 
 
 {# fun jit_insn_ge as ge
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_cmpl as cmpl
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_cmpg as cmpg
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' checkedValue* #} 
@@ -481,7 +564,7 @@ DONE: jit_value_t jit_insn_div
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_rem
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_rem_ieee
+DONE: jit_value_t jit_insn_rem_ieee
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_neg
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
@@ -513,51 +596,51 @@ DONE: jit_value_t jit_insn_gt
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_ge
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_cmpl
+DONE: jit_value_t jit_insn_cmpl
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_cmpg
+DONE: jit_value_t jit_insn_cmpg
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 jit_value_t jit_insn_to_bool
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
 jit_value_t jit_insn_to_not_bool
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_acos
+DONE: jit_value_t jit_insn_acos
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_asin
+DONE: jit_value_t jit_insn_asin
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_atan
+DONE: jit_value_t jit_insn_atan
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_atan2
+DONE: jit_value_t jit_insn_atan2
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_ceil
+DONE: jit_value_t jit_insn_ceil
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_cos
+DONE: jit_value_t jit_insn_cos
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_cosh
+DONE: jit_value_t jit_insn_cosh
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_exp
+DONE: jit_value_t jit_insn_exp
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_floor
+DONE: jit_value_t jit_insn_floor
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_log
+DONE: jit_value_t jit_insn_log
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_log10
+DONE: jit_value_t jit_insn_log10
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_pow
+DONE: jit_value_t jit_insn_pow
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_rint
+DONE: jit_value_t jit_insn_rint
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_round
+DONE: jit_value_t jit_insn_round
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_sin
+DONE: jit_value_t jit_insn_sin
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_sinh
+DONE: jit_value_t jit_insn_sinh
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_sqrt
+DONE: jit_value_t jit_insn_sqrt
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_tan
+DONE: jit_value_t jit_insn_tan
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_tanh
+DONE: jit_value_t jit_insn_tanh
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
 jit_value_t jit_insn_is_nan
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
