@@ -261,7 +261,17 @@ getUndefinedLabel =
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
 
+{# fun unsafe jit_insn_mul_ovf as mul_ovf
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
 {# fun unsafe jit_insn_add as add
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_add_ovf as add_ovf
    { fromFunction `Function' ,
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
@@ -271,10 +281,26 @@ getUndefinedLabel =
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
 
+{# fun unsafe jit_insn_sub_ovf as sub_ovf
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
 {# fun unsafe jit_insn_div as div
    { fromFunction `Function' ,
      fromValue    `Value' ,
      fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_rem as rem
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
+{# fun unsafe jit_insn_rem_ieee as rem_ieee
+   { fromFunction `Function' ,
+     fromValue    `Value' ,
+     fromValue    `Value' } -> `Value' checkedValue* #} 
+
 
 {# fun unsafe jit_insn_neg as neg
    { fromFunction `Function' ,
@@ -287,10 +313,32 @@ getUndefinedLabel =
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' checkedValue* #} 
 
+{# fun jit_insn_le as le
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_gt as gt
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_ge as ge
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+
 {# fun jit_insn_eq as eq
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_ne as ne
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
 
 {# fun jit_insn_and as and
    { fromFunction  `Function' ,
@@ -303,6 +351,30 @@ getUndefinedLabel =
      fromValue     `Value' } -> `Value' checkedValue* #} 
 
 {# fun jit_insn_xor as xor
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_not as not
+   { fromFunction  `Function' ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_shl as shl
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_shr as shr
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_sshr as sshr
+   { fromFunction  `Function' ,
+     fromValue     `Value'    ,
+     fromValue     `Value' } -> `Value' checkedValue* #} 
+
+{# fun jit_insn_ushr as ushr
    { fromFunction  `Function' ,
      fromValue     `Value'    ,
      fromValue     `Value' } -> `Value' checkedValue* #} 
@@ -329,7 +401,7 @@ getUndefinedLabel =
      fromValue    `Value' } -> `()' #}  
 
 -- Function calls
--- TODO: Figure this one out (how to use it) 
+
 {# fun unsafe jit_insn_call_native as callNativeFunction 
    { fromFunction `Function'   ,
      withCString* `String'     ,
@@ -395,15 +467,15 @@ int jit_insn_check_null(jit_function_t func, jit_value_t value) JIT_NOTHROW;
 
 DONE: jit_value_t jit_insn_add
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_add_ovf
+DONE: jit_value_t jit_insn_add_ovf
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_sub
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_sub_ovf
+DONE: jit_value_t jit_insn_sub_ovf
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_mul
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_mul_ovf
+DONE: jit_value_t jit_insn_mul_ovf
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_div
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
@@ -419,27 +491,27 @@ DONE: jit_value_t jit_insn_or
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_xor
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_not
+DONE: jit_value_t jit_insn_not
 	(jit_function_t func, jit_value_t value1) JIT_NOTHROW;
-jit_value_t jit_insn_shl
+DONE: jit_value_t jit_insn_shl
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_shr
+DOME: jit_value_t jit_insn_shr
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_ushr
+DONE: jit_value_t jit_insn_ushr
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_sshr
+DONE: jit_value_t jit_insn_sshr
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_eq
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_ne
+DONE: jit_value_t jit_insn_ne
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 DONE: jit_value_t jit_insn_lt
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_le
+DONE: jit_value_t jit_insn_le
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_gt
+DONE: jit_value_t jit_insn_gt
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
-jit_value_t jit_insn_ge
+DONE: jit_value_t jit_insn_ge
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
 jit_value_t jit_insn_cmpl
 	(jit_function_t func, jit_value_t value1, jit_value_t value2) JIT_NOTHROW;
