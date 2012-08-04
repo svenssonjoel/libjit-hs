@@ -1,10 +1,9 @@
 {- Tests -}
 
 -- Compile:  ghc --make test.hs ./Libjit/cbits/o/extra.o -ljit 
-import Libjit.Context
-import Libjit.Jit
+import Libjit
 import Libjit.Raw
-import Libjit.Function
+
 
 import Foreign.Ptr
 import Foreign.Storable
@@ -17,7 +16,9 @@ import Data.Int
 main =
   jitSession $ do 
     -- ctx <- contextCreate
-    (Just ctx) <- get 
+    (Just ctx) <- get
+    -- change "getIntType" to not being in IO monad.
+    -- maybe also change the name. 
     int_type <- liftIO$ getIntType 
     liftIO$ startBuild(ctx)
     sig <- liftIO$ createTypeSignature CDECL

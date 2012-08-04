@@ -19,6 +19,7 @@ import Data.Typeable
 import Control.Exception
 import Control.Monad
 
+import System.IO.Unsafe
 
 #include <jit/jit.h>
 #include "cbits/src/extra.h"
@@ -785,6 +786,8 @@ jit_insn_t jit_insn_iter_previous(jit_insn_iter_t *iter) JIT_NOTHROW;
 -- TODO: One of these for each type 
 {# fun unsafe get_void_type as getVoidType 
    {  } -> `Type' Type #}  
+
+voidType = unsafePerformIO getVoidType
 
 {# fun unsafe get_sbyte_type as getSByteType 
    {  } -> `Type' Type #}  

@@ -1,5 +1,5 @@
 
-import Libjit
+import Libjit.Raw
 
 import Foreign.Ptr
 import Foreign.Storable

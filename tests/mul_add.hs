@@ -1,7 +1,7 @@
 {- Tests -}
 
 -- Compile:  ghc --make test.hs ./Libjit/cbits/o/extra.o -ljit 
-import Libjit 
+import Libjit.Raw 
 
 import Foreign.Ptr
 import Foreign.Storable
