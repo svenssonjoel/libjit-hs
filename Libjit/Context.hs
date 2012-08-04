@@ -12,5 +12,8 @@ withContext f x =
   do
     ctx <- liftIO contextCreate
     put ctx
-    f x 
+    b <- f x
+    liftIO $ contextDestroy ctx
+    return b 
+
 
