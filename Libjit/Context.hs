@@ -1,5 +1,5 @@
 
-module Libjit.Context (withContext)  where
+module Libjit.Context  where
 
 import Libjit.Raw
 import Libjit.Jit
@@ -7,13 +7,14 @@ import Libjit.Jit
 import Control.Monad.State
 import Control.Monad.IO.Class
 
-withContext :: (a -> Jit b) -> a -> Jit b 
-withContext f x =
+{-
+withContext :: Jit a -> Jit a 
+withContext jit =
   do
-    ctx <- liftIO contextCreate
-    put ctx
-    b <- f x
-    liftIO $ contextDestroy ctx
-    return b 
-
+    ctx <- contextCreate
+    put (Just ctx)
+    a <- runJit jit
+    contextDestroy ctx
+    return a
+-}
 
