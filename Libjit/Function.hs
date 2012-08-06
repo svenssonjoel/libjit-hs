@@ -4,7 +4,8 @@
 
 module Libjit.Function ( ABI(..)   -- Raw
                        , Function  -- Raw
-                       , buildFun, runFunBuilder
+                       , mkFun, runFunBuilder
+                       , compile 
                        , getParam
                        , add, mul, ret ) where
 
@@ -63,22 +64,39 @@ getContext =
 runFunBuilder :: FunBuilder a -> Jit a
 runFunBuilder (FunBuilder fb) = evalStateT fb [] 
 
-buildFun :: ABI -> Type -> [Type] -> FunBuilder () -> FunBuilder Function
-buildFun abi out_t in_t body =
+mkFun :: ABI -> Type -> [Type] -> FunBuilder () -> FunBuilder Function
+mkFun abi out_t in_t body =
   do
-    -- TODO: The last int is really an enum type, fix this ! 
+    -- TODO: The last int is really an enum type, fix this !
+    ctx <- getContext
+
+    liftIO$ Raw.startBuild ctx
+    
     sig <- liftIO$ Raw.createTypeSignature abi out_t in_t nargs 1
 
-    ctx <- getContext
+    
     fun <- liftIO$ Raw.createFunction ctx sig
     push fun
-    body 
-    fun <- pop 
+    body
+
+    liftIO$ Raw.endBuild ctx 
+    
+    fun <- pop
     return fun 
     where
       nargs = length in_t
  
 -- Lift instructions into FunBuilder.
+
+compile :: Function -> Jit ()
+compile f =
+  do
+    (Just ctx) <- get 
+    liftIO$
+      do
+        Raw.startBuild ctx
+        Raw.compile f
+        Raw.endBuild ctx 
 
 lift1 :: (Function -> a -> IO b) -> a -> FunBuilder b
 lift1 f a = do {fun <- top; liftJit $ liftIO $ f fun a}

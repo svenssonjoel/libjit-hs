@@ -17,14 +17,11 @@ import Data.Int
 
 main =
   jitSession $ do 
-    -- ctx <- contextCreate
-    (Just ctx) <- get
     -- change "getIntType" to not being in IO monad.
     -- maybe also change the name. 
     int_type <- liftIO$ Raw.getIntType 
-    liftIO$ Raw.startBuild(ctx)
-
-    fun <- runFunBuilder $ buildFun CDECL
+  
+    fun <- runFunBuilder $ mkFun CDECL
                                     int_type
                                     [int_type, int_type,int_type] $
       do
@@ -35,9 +32,8 @@ main =
         tmp2 <- add tmp1 c
         ret tmp2
 
-    liftIO$ Raw.compile fun 
-    liftIO$ Raw.endBuild ctx 
-
+    compile fun 
+    
     -- Hackity
     liftIO$ withArray [3,5,2,0 :: Int] $ \ ptr ->
       do 
