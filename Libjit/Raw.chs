@@ -110,6 +110,51 @@ enum CALL_FLAG_ENUM {
 
 {# enum CALL_FLAG_ENUM as CallFlag {underscoreToCase} deriving (Eq,Show) #} 
 
+----------------------------------------------------------------------------
+-- BaseTypes (these are constants defined in jit-type.c) 
+----------------------------------------------------------------------------
+void_type = Type (unsafePerformIO (peek voidT'))
+foreign import ccall "jit/jit.h &jit_type_void" voidT' :: Ptr (Ptr ())  
+
+sbyte_type = Type (unsafePerformIO (peek sbyteT'))
+foreign import ccall "jit/jit.h &jit_type_sbyte" sbyteT' :: Ptr (Ptr ()) 
+
+ubyte_type = Type (unsafePerformIO (peek ubyteT'))
+foreign import ccall "jit/jit.h &jit_type_ubyte" ubyteT' :: Ptr (Ptr ()) 
+
+short_type = Type (unsafePerformIO (peek shortT'))
+foreign import ccall "jit/jit.h &jit_type_short" shortT' :: Ptr (Ptr ()) 
+
+ushort_type = Type (unsafePerformIO (peek ushortT'))
+foreign import ccall "jit/jit.h &jit_type_ushort" ushortT' :: Ptr (Ptr ()) 
+
+int_type = Type (unsafePerformIO (peek intT'))
+foreign import ccall "jit/jit.h &jit_type_int" intT' :: Ptr (Ptr ()) 
+
+uint_type = Type (unsafePerformIO (peek uintT'))
+foreign import ccall "jit/jit.h &jit_type_uint" uintT' :: Ptr (Ptr ()) 
+
+nint_type = Type (unsafePerformIO (peek nintT'))
+foreign import ccall "jit/jit.h &jit_type_nint" nintT' :: Ptr (Ptr ()) 
+
+nuint_type = Type (unsafePerformIO (peek nuintT'))
+foreign import ccall "jit/jit.h &jit_type_nuint" nuintT' :: Ptr (Ptr ()) 
+
+long_type = Type (unsafePerformIO (peek longT'))
+foreign import ccall "jit/jit.h &jit_type_long" longT' :: Ptr (Ptr ()) 
+
+ulong_type = Type (unsafePerformIO (peek ulongT'))
+foreign import ccall "jit/jit.h &jit_type_ulong" ulongT' :: Ptr (Ptr ()) 
+
+float32_type = Type (unsafePerformIO (peek float32T'))
+foreign import ccall "jit/jit.h &jit_type_float32" float32T' :: Ptr (Ptr ()) 
+
+float64_type = Type (unsafePerformIO (peek float64T'))
+foreign import ccall "jit/jit.h &jit_type_float64" float64T' :: Ptr (Ptr ()) 
+
+void_ptr_type = Type (unsafePerformIO (peek void_ptrT'))
+foreign import ccall "jit/jit.h &jit_type_void_ptr" void_ptrT' :: Ptr (Ptr ()) 
+
 
 ----------------------------------------------------------------------------
 -- Context  (jit-context.h) 
@@ -784,6 +829,7 @@ jit_insn_t jit_insn_iter_previous(jit_insn_iter_t *iter) JIT_NOTHROW;
 -- extra, these things are implemented in extra.c 
 ----------------------------------------------------------------------------
 -- TODO: One of these for each type 
+{- 
 {# fun unsafe get_void_type as getVoidType 
    {  } -> `Type' Type #}  
 
@@ -812,4 +858,4 @@ voidType = unsafePerformIO getVoidType
 
 {# fun unsafe get_float64_type as getFloat64Type 
    {  } -> `Type' Type #}  
-
+-} 

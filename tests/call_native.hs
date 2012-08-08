@@ -19,7 +19,7 @@ foreign import ccall "stdio.h &putchar"
 main =
   do
     ctx <- contextCreate 
-    int_type <- getIntType 
+    -- int_type <- getIntType 
     startBuild(ctx)
     funsig <- createTypeSignature CDECL
                                   int_type

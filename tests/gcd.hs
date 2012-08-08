@@ -12,7 +12,7 @@ import Data.Int
 main =
   do
     ctx <- contextCreate
-    uint_type <- getUIntType
+    -- uint_type <- getUIntType
     startBuild(ctx)
     lab1 <- getUndefinedLabel
     lab2 <- getUndefinedLabel

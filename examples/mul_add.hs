@@ -5,7 +5,7 @@
 -- Compile:  ghc --make test.hs ./Libjit/cbits/o/extra.o -ljit 
 import Libjit
 import qualified Libjit.Raw as Raw
-
+import Libjit.Raw (int_type) -- export all these in Libjit.hs
 
 import Foreign.Ptr
 import Foreign.Storable
@@ -19,7 +19,7 @@ main =
   jitSession $ do 
     -- change "getIntType" to not being in IO monad.
     -- maybe also change the name. 
-    int_type <- liftIO$ Raw.getIntType 
+    -- int_type <- liftIO$ Raw.getIntType 
   
     fun <- runFunBuilder $ mkFun CDECL
                                     int_type

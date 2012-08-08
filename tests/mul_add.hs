@@ -12,7 +12,7 @@ import Data.Int
 main =
   do
     ctx <- contextCreate 
-    int_type <- getIntType 
+    
     startBuild(ctx)
     sig <- createTypeSignature CDECL
                                int_type
