@@ -15,6 +15,7 @@ import Foreign.Marshal.Array
 
 import Data.Word
 import Data.Typeable
+import Data.Bits
 
 import Control.Exception
 import Control.Monad
@@ -22,7 +23,7 @@ import Control.Monad
 import System.IO.Unsafe
 
 #include <jit/jit.h>
-#include "cbits/src/extra.h"
+-- #include "cbits/src/extra.h"
 
 ----------------------------------------------------------------------------
 -- Types
@@ -39,7 +40,7 @@ newtype Value    = Value {fromValue :: Ptr ()}
 --        Top ensure that the label is not "freed" while
 --        still needed by libjit 
 newtype Label    = Label (ForeignPtr CULong)
-fromLabel (Label fptr) = unsafeForeignPtrToPtr fptr
+fromLabel (Label fptr) = unsafeForeignPtrToPtr fptr 
 ----------------------------------------------------------------------------
 -- Helpers
 ----------------------------------------------------------------------------
@@ -154,6 +155,21 @@ foreign import ccall "jit/jit.h &jit_type_float64" float64T' :: Ptr (Ptr ())
 
 void_ptr_type = Type (unsafePerformIO (peek void_ptrT'))
 foreign import ccall "jit/jit.h &jit_type_void_ptr" void_ptrT' :: Ptr (Ptr ()) 
+
+----------------------------------------------------------------------------
+-- Undefined label 
+----------------------------------------------------------------------------
+
+-- TODO: very skeptic to these labels.
+--       I do not think I am doing it right. 
+getUndefinedLabel :: IO Label
+getUndefinedLabel =
+  do 
+    fptr <- mallocForeignPtr
+    let ptr = unsafeForeignPtrToPtr fptr
+    putStrLn $ show ptr    
+    poke ptr (0xFFFFFFFF :: CULong)
+    return $ Label fptr
 
 
 ----------------------------------------------------------------------------
@@ -284,18 +300,6 @@ unsigned int jit_function_get_optimization_level
 unsigned int jit_function_get_max_optimization_level(void) JIT_NOTHROW;
 jit_label_t jit_function_reserve_label(jit_function_t func) JIT_NOTHROW;
 -} 
-----------------------------------------------------------------------------
--- Labels
-----------------------------------------------------------------------------
-getUndefinedLabel =
- do
-   value <- getUndefLab
-   lab <- mallocForeignPtr 
-   poke  (unsafeForeignPtrToPtr lab) value
-   return (Label lab)
-
-{# fun unsafe getUndefinedLabel as getUndefLab 
-    { } -> `CULong' cFromInt #} 
 
 ----------------------------------------------------------------------------
 -- Instructions (jit-insn.h)  
