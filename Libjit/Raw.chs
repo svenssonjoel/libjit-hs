@@ -23,7 +23,6 @@ import Control.Monad
 import System.IO.Unsafe
 
 #include <jit/jit.h>
--- #include "cbits/src/extra.h"
 
 ----------------------------------------------------------------------------
 -- Types
@@ -183,7 +182,7 @@ contextCreate = contextCreate' >>= throwOnBadContext
 {# fun unsafe jit_context_destroy as contextDestroy 
    { fromContext `Context' } -> `()' #} 
 
--- TODO: figure out what to do with this one (1 means True, 0 means false) 
+-- DONE: figure out what to do with this one (1 means True, 0 means false) 
 {# fun unsafe jit_context_supports_threads as contextSupportsThreads 
    { fromContext `Context' } -> `Bool' intToBool #} 
 
@@ -196,7 +195,7 @@ contextCreate = contextCreate' >>= throwOnBadContext
 {- 
 DONE: jit_context_t jit_context_create(void) JIT_NOTHROW;
 DONE: void jit_context_destroy(jit_context_t context) JIT_NOTHROW;
-IN PROGRESS: int jit_context_supports_threads(jit_context_t context) JIT_NOTHROW;
+DONE: int jit_context_supports_threads(jit_context_t context) JIT_NOTHROW;
 DONE: void jit_context_build_start(jit_context_t context) JIT_NOTHROW;
 DONE: void jit_context_build_end(jit_context_t context) JIT_NOTHROW;
 void jit_context_set_on_demand_driver(
@@ -229,6 +228,12 @@ createFunction c t = createFunction' c t >>= throwOnBadFunction
    { fromContext `Context' ,
      fromType    `Type' } -> `Function' Function #} 
 
+{# fun unsafe jit_function_get_context as getFunctionContext
+   { fromFunction `Function' } -> `Context' Context #} 
+
+{# fun unsafe jit_function_get_signature as getFunctionSignature
+   { fromFunction `Function' } -> `Type' Type #} 
+
 createNestedFunction c t f = createNestedFunction' c t f >>= throwOnBadFunction 
 
 {# fun unsafe jit_function_create_nested as createNestedFunction'
@@ -257,7 +262,7 @@ DONE: jit_function_t jit_function_create_nested
 	(jit_context_t context, jit_type_t signature,
 	 jit_function_t parent) JIT_NOTHROW;
 DONE: void jit_function_abandon(jit_function_t func) JIT_NOTHROW;
-jit_context_t jit_function_get_context(jit_function_t func) JIT_NOTHROW;
+DONE: jit_context_t jit_function_get_context(jit_function_t func) JIT_NOTHROW;
 jit_type_t jit_function_get_signature(jit_function_t func) JIT_NOTHROW;
 int jit_function_set_meta
 	(jit_function_t func, int type, void *data,
@@ -271,7 +276,7 @@ jit_function_t jit_function_previous
 jit_block_t jit_function_get_entry(jit_function_t func) JIT_NOTHROW;
 jit_block_t jit_function_get_current(jit_function_t func) JIT_NOTHROW;
 jit_function_t jit_function_get_nested_parent(jit_function_t func) JIT_NOTHROW;
-int jit_function_compile(jit_function_t func) JIT_NOTHROW;
+DONE: int jit_function_compile(jit_function_t func) JIT_NOTHROW;
 int jit_function_is_compiled(jit_function_t func) JIT_NOTHROW;
 void jit_function_set_recompilable(jit_function_t func) JIT_NOTHROW;
 void jit_function_clear_recompilable(jit_function_t func) JIT_NOTHROW;
