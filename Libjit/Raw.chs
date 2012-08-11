@@ -27,10 +27,11 @@ import System.IO.Unsafe
 ----------------------------------------------------------------------------
 -- Types
 ----------------------------------------------------------------------------
-newtype Context = Context {fromContext :: Ptr ()} 
-newtype Type = Type {fromType :: Ptr ()} 
+newtype Context  = Context {fromContext :: Ptr ()} 
+newtype Type     = Type {fromType :: Ptr ()} 
 newtype Function = Function {fromFunction :: Ptr ()}
 newtype Value    = Value {fromValue :: Ptr ()}
+newtype Block    = Block {fromBlock :: Ptr ()} 
 
 -- Label is different from most other libjit types.
 --  Label is an unsigned long  in C.
@@ -166,7 +167,6 @@ getUndefinedLabel =
   do 
     fptr <- mallocForeignPtr
     let ptr = unsafeForeignPtrToPtr fptr
-    putStrLn $ show ptr    
     poke ptr (0xFFFFFFFF :: CULong)
     return $ Label fptr
 
@@ -255,6 +255,29 @@ createNestedFunction c t f = createNestedFunction' c t f >>= throwOnBadFunction
    { fromFunction `Function' ,
      withArray*   `[Ptr ()]' ,
             id    `Ptr ()' } -> `()' #} 
+
+{# fun unsafe jit_function_get_entry as getFunctionEntry 
+   { fromFunction `Function' } -> `Block' Block #} 
+
+{# fun unsafe jit_function_get_current as getFunctionCurrent 
+   { fromFunction `Function' } -> `Block' Block #} 
+
+{# fun unsafe jit_function_is_compiled as isCompiled 
+   { fromFunction `Function' } -> `Bool' intToBool #} 
+
+{# fun unsafe jit_function_set_optimization_level as setOptLevel 
+   { fromFunction `Function' ,
+     cFromInt     `Int'  } -> `()' id #} 
+
+{# fun unsafe jit_function_get_optimization_level as getOptLevel 
+   { fromFunction `Function' } -> `Int' cFromInt #} 
+
+
+{# fun pure unsafe jit_function_get_max_optimization_level as maxOptLevel 
+   { } -> `Int' cFromInt #} 
+
+
+
 {-  
 DONE: jit_function_t jit_function_create
 	(jit_context_t context, jit_type_t signature) JIT_NOTHROW;
@@ -263,7 +286,7 @@ DONE: jit_function_t jit_function_create_nested
 	 jit_function_t parent) JIT_NOTHROW;
 DONE: void jit_function_abandon(jit_function_t func) JIT_NOTHROW;
 DONE: jit_context_t jit_function_get_context(jit_function_t func) JIT_NOTHROW;
-jit_type_t jit_function_get_signature(jit_function_t func) JIT_NOTHROW;
+DONE: jit_type_t jit_function_get_signature(jit_function_t func) JIT_NOTHROW;
 int jit_function_set_meta
 	(jit_function_t func, int type, void *data,
 	 jit_meta_free_func free_data, int build_only) JIT_NOTHROW;
@@ -273,11 +296,11 @@ jit_function_t jit_function_next
 	(jit_context_t context, jit_function_t prev) JIT_NOTHROW;
 jit_function_t jit_function_previous
 	(jit_context_t context, jit_function_t prev) JIT_NOTHROW;
-jit_block_t jit_function_get_entry(jit_function_t func) JIT_NOTHROW;
-jit_block_t jit_function_get_current(jit_function_t func) JIT_NOTHROW;
+DONE: jit_block_t jit_function_get_entry(jit_function_t func) JIT_NOTHROW;
+DONE: jit_block_t jit_function_get_current(jit_function_t func) JIT_NOTHROW;
 jit_function_t jit_function_get_nested_parent(jit_function_t func) JIT_NOTHROW;
 DONE: int jit_function_compile(jit_function_t func) JIT_NOTHROW;
-int jit_function_is_compiled(jit_function_t func) JIT_NOTHROW;
+DONE: int jit_function_is_compiled(jit_function_t func) JIT_NOTHROW;
 void jit_function_set_recompilable(jit_function_t func) JIT_NOTHROW;
 void jit_function_clear_recompilable(jit_function_t func) JIT_NOTHROW;
 int jit_function_is_recompilable(jit_function_t func) JIT_NOTHROW;
@@ -294,15 +317,15 @@ jit_function_t jit_function_from_vtable_pointer
 void jit_function_set_on_demand_compiler
 	(jit_function_t func, jit_on_demand_func on_demand) JIT_NOTHROW;
 jit_on_demand_func jit_function_get_on_demand_compiler(jit_function_t func) JIT_NOTHROW;
-int jit_function_apply
+DONE: int jit_function_apply
 	(jit_function_t func, void **args, void *return_area);
 int jit_function_apply_vararg
 	(jit_function_t func, jit_type_t signature, void **args, void *return_area);
-void jit_function_set_optimization_level
+DONE: void jit_function_set_optimization_level
 	(jit_function_t func, unsigned int level) JIT_NOTHROW;
-unsigned int jit_function_get_optimization_level
+DONE: unsigned int jit_function_get_optimization_level
 	(jit_function_t func) JIT_NOTHROW;
-unsigned int jit_function_get_max_optimization_level(void) JIT_NOTHROW;
+DOME: unsigned int jit_function_get_max_optimization_level(void) JIT_NOTHROW;
 jit_label_t jit_function_reserve_label(jit_function_t func) JIT_NOTHROW;
 -} 
 
@@ -833,38 +856,4 @@ void jit_insn_iter_init_last
 	(jit_insn_iter_t *iter, jit_block_t block) JIT_NOTHROW;
 jit_insn_t jit_insn_iter_next(jit_insn_iter_t *iter) JIT_NOTHROW;
 jit_insn_t jit_insn_iter_previous(jit_insn_iter_t *iter) JIT_NOTHROW;
--} 
-----------------------------------------------------------------------------
--- extra, these things are implemented in extra.c 
-----------------------------------------------------------------------------
--- TODO: One of these for each type 
-{- 
-{# fun unsafe get_void_type as getVoidType 
-   {  } -> `Type' Type #}  
-
-voidType = unsafePerformIO getVoidType
-
-{# fun unsafe get_sbyte_type as getSByteType 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_ubyte_type as getUByteType 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_int_type as getIntType 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_uint_type as getUIntType 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_long_type as getLongType 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_ulong_type as getULongType 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_float32_type as getFloat32Type 
-   {  } -> `Type' Type #}  
-
-{# fun unsafe get_float64_type as getFloat64Type 
-   {  } -> `Type' Type #}  
 -} 
