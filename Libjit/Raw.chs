@@ -40,7 +40,9 @@ newtype Block    = Block {fromBlock :: Ptr ()}
 --        Top ensure that the label is not "freed" while
 --        still needed by libjit 
 newtype Label    = Label (ForeignPtr CULong)
-fromLabel (Label fptr) = unsafeForeignPtrToPtr fptr 
+fromLabel (Label fptr) = unsafeForeignPtrToPtr fptr
+
+
 ----------------------------------------------------------------------------
 -- Helpers
 ----------------------------------------------------------------------------
@@ -170,6 +172,13 @@ getUndefinedLabel =
     poke ptr (0xFFFFFFFF :: CULong)
     return $ Label fptr
 
+makeLabel :: CULong -> IO Label
+makeLabel l =
+  do 
+    fptr <- mallocForeignPtr
+    let ptr = unsafeForeignPtrToPtr fptr
+    poke ptr l
+    return $ Label fptr
 
 ----------------------------------------------------------------------------
 -- Context  (jit-context.h) 
@@ -276,7 +285,8 @@ createNestedFunction c t f = createNestedFunction' c t f >>= throwOnBadFunction
 {# fun pure unsafe jit_function_get_max_optimization_level as maxOptLevel 
    { } -> `Int' cFromInt #} 
 
-
+{# fun unsafe jit_function_reserve_label as reserveLabel 
+   { fromFunction `Function' } -> `Label' makeLabel* #} 
 
 {-  
 DONE: jit_function_t jit_function_create
@@ -325,8 +335,8 @@ DONE: void jit_function_set_optimization_level
 	(jit_function_t func, unsigned int level) JIT_NOTHROW;
 DONE: unsigned int jit_function_get_optimization_level
 	(jit_function_t func) JIT_NOTHROW;
-DOME: unsigned int jit_function_get_max_optimization_level(void) JIT_NOTHROW;
-jit_label_t jit_function_reserve_label(jit_function_t func) JIT_NOTHROW;
+DONE: unsigned int jit_function_get_max_optimization_level(void) JIT_NOTHROW;
+DONE: jit_label_t jit_function_reserve_label(jit_function_t func) JIT_NOTHROW;
 -} 
 
 ----------------------------------------------------------------------------
