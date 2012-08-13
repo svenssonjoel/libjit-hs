@@ -67,14 +67,13 @@ runFunBuilder (FunBuilder fb) = evalStateT fb []
 mkFun :: ABI -> Type -> [Type] -> FunBuilder () -> FunBuilder Function
 mkFun abi out_t in_t body =
   do
-    -- TODO: The last int is really an enum type, fix this !
+    
     ctx <- getContext
 
     liftIO$ Raw.startBuild ctx
-    
+    -- TODO: The last int is really an enum type, fix this !
     sig <- liftIO$ Raw.createTypeSignature abi out_t in_t nargs 1
 
-    
     fun <- liftIO$ Raw.createFunction ctx sig
     push fun
     body
@@ -103,6 +102,9 @@ lift1 f a = do {fun <- top; liftJit $ liftIO $ f fun a}
 
 lift2 :: (Function -> a -> b -> IO c) -> a -> b -> FunBuilder c
 lift2 f a b = do {fun <- top; liftJit $ liftIO $ f fun a b} 
+
+lift3 :: (Function -> a -> b -> c -> IO d) -> a -> b -> c -> FunBuilder d
+lift3 f a b c = do {fun <- top; liftJit $ liftIO $ f fun a b c} 
 
 getParam :: Int -> FunBuilder Value
 getParam i = do { fun <- top; liftJit $ liftIO $ Raw.getParam fun i}
