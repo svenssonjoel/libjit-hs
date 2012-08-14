@@ -597,6 +597,31 @@ DONE: jit_label_t jit_function_reserve_label(jit_function_t func) JIT_NOTHROW;
    { fromFunction `Function'   ,
      fromLabel    `Label'  } -> `()' #}
 
+-- Loads and stores
+{# fun unsafe jit_insn_load as load 
+   { fromFunction `Function'   ,
+     fromValue    `Value' } -> `Value' Value #} 
+
+{# fun unsafe jit_insn_dup as dup 
+   { fromFunction `Function'   ,
+     fromValue    `Value'  } -> `Value' Value #} 
+
+{# fun unsafe jit_insn_load_small as loadSmall
+   { fromFunction `Function'   ,
+     fromValue    `Value'  } -> `Value' Value #}
+
+{# fun unsafe jit_insn_store as store 
+   { fromFunction `Function'    ,
+     fromValue    `Value'       ,
+     fromValue    `Value'  } -> `Bool' intToBool #}
+
+{# fun unsafe jit_insn_load_relative as loadRelative
+   { fromFunction `Function'    ,
+     fromValue    `Value'       ,
+     cFromInt     `Int'         ,
+     fromType     `Type'   } -> `Value' Value #}
+
+
 {- 
 int jit_insn_get_opcode(jit_insn_t insn) JIT_NOTHROW;
 jit_value_t jit_insn_get_dest(jit_insn_t insn) JIT_NOTHROW;
@@ -611,13 +636,13 @@ int jit_insn_dest_is_value(jit_insn_t insn) JIT_NOTHROW;
 
 DONE: int jit_insn_label(jit_function_t func, jit_label_t *label) JIT_NOTHROW;
 int jit_insn_new_block(jit_function_t func) JIT_NOTHROW;
-jit_value_t jit_insn_load(jit_function_t func, jit_value_t value) JIT_NOTHROW;
-jit_value_t jit_insn_dup(jit_function_t func, jit_value_t value) JIT_NOTHROW;
-jit_value_t jit_insn_load_small
+DONE: jit_value_t jit_insn_load(jit_function_t func, jit_value_t value) JIT_NOTHROW;
+DONE: jit_value_t jit_insn_dup(jit_function_t func, jit_value_t value) JIT_NOTHROW;
+DONE: jit_value_t jit_insn_load_small
 	(jit_function_t func, jit_value_t value) JIT_NOTHROW;
-int jit_insn_store
+DONE: int jit_insn_store
 	(jit_function_t func, jit_value_t dest, jit_value_t value) JIT_NOTHROW;
-jit_value_t jit_insn_load_relative
+DONE: jit_value_t jit_insn_load_relative
 	(jit_function_t func, jit_value_t value,
 	 jit_nint offset, jit_type_t type) JIT_NOTHROW;
 int jit_insn_store_relative
