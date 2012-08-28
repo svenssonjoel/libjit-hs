@@ -1,0 +1,45 @@
+Name:           libjit-hs
+Version:        0.0.0.1
+
+License:                BSD3
+License-file:           LICENSE
+Stability:              Beta
+Maintainer:		Joel Svensson<svenssonjoel@yahoo.se>
+Author:			Joel Svensson<svenssonjoel@yahoo.se>
+
+Copyright:              Copyright (c) 2012 Joel Svensson
+Synopsis:               FFI binding the GNU LibJIT library 
+HomePage:               http://svenssonjoel.github.com
+Description: 
+   Bindings to the GNU LibJIT library
+
+Category: Foreign
+Cabal-Version: >=1.8
+Tested-With: GHC == 7.0.4
+
+build-type: Simple
+
+--  extra-source-files:
+    
+
+source-repository head
+  type:     git
+  location: git://github.com/svenssonjoel/libjit-hs.git
+
+----------------------------------------------------------------------------------------------------
+Library
+  build-depends: base >= 4 && < 5
+               , mtl == 2.1
+               , transformers == 0.3.0.0
+ 
+  exposed-modules: Libjit.Raw
+                 , Libjit.Jit
+                 , Libjit.Function
+--  other-modules: 
+
+  GHC-Options: 
+
+  Includes: jit/jit.h 
+--Extra-libraries: libjit
+  
+
