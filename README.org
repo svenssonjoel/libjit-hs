@@ -1,3 +1,11 @@
 * libjit-hs
- -  Libjit bindings for Haskell (Work in progress)  
- 
+ - Libjit bindings for Haskell (Work in progress)  
+ - Targets version 0.1.2 of LibJIT that can be downloaded here: http://download.savannah.gnu.org/releases/dotgnu-pnet/libjit-releases/
+   
+* News
+ - Added a sketchy .cabal file 
+
+* TODOs
+ - Cover the complete set of instructions available. 
+ - Evaluate if adding a typed layer on top of the Value type (phantom types) is useful. 
+   
